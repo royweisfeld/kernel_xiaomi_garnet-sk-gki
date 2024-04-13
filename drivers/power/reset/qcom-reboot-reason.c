@@ -77,7 +77,6 @@ int ufs_ffu_reboot_reason_reboot(void *ptr)
 
 	return NOTIFY_OK;
 }
-EXPORT_SYMBOL(ufs_ffu_reboot_reason_reboot);
  
 static int qcom_reboot_reason_reboot(struct notifier_block *this,
 				     unsigned long event, void *ptr)
@@ -143,8 +142,6 @@ static int qcom_reboot_reason_probe(struct platform_device *pdev)
 	reboot->panic_nb.notifier_call = panic_prep_restart;
 	reboot->panic_nb.priority = INT_MAX;
 	atomic_notifier_chain_register(&panic_notifier_list, &reboot->panic_nb);
-
-	ffu_reboot = reboot;
 
 	return 0;
 }
