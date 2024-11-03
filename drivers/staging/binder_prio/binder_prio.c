@@ -15,7 +15,6 @@ static const char *task_name[] = {
 	"surfaceflinger",
 	"cameraserver",
 	"rsonalassistant",  // com.miui.personalassistant
-	"egram.messenger",  // org.telegram.messenger
         "com.HoYoverse",  // com.HoYoverse.hkrpgoversea
         "com.miHoYo",  // com.miHoYo.GenshinImpact
 
