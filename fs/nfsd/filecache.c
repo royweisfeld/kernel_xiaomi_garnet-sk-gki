@@ -636,6 +636,11 @@ nfsd_file_cache_init(void)
 	if (nfsd_file_hashtbl)
 		return 0;
 
+	ret = rhltable_init(&nfsd_file_rhltable, &nfsd_file_rhash_params);
+	if (ret)
+		goto out;
+
+	ret = -ENOMEM;
 	nfsd_filecache_wq = alloc_workqueue("nfsd_filecache", 0, 0);
 	if (!nfsd_filecache_wq)
 		goto out;
@@ -695,6 +700,8 @@ nfsd_file_cache_init(void)
 
 	INIT_DELAYED_WORK(&nfsd_filecache_laundrette, nfsd_file_gc_worker);
 out:
+	if (ret)
+		clear_bit(NFSD_FILE_CACHE_UP, &nfsd_file_flags);
 	return ret;
 out_notifier:
 	lease_unregister_notifier(&nfsd_file_lease_notifier);
@@ -970,8 +977,10 @@ retry:
 	nf = nfsd_file_find_locked(inode, may_flags, hashval, net);
 	if (nf == NULL)
 		goto open_file;
-	spin_unlock(&nfsd_file_hashtbl[hashval].nfb_lock);
-	nfsd_file_slab_free(&new->nf_rcu);
+
+	trace_nfsd_file_insert_err(rqstp, inode, may_flags, ret);
+	status = nfserr_jukebox;
+	goto construction_err;
 
 wait_for_construction:
 	wait_on_bit(&nf->nf_flags, NFSD_FILE_PENDING, TASK_UNINTERRUPTIBLE);
@@ -982,8 +991,8 @@ wait_for_construction:
 			status = nfserr_jukebox;
 			goto out;
 		}
-		retry = false;
-		nfsd_file_put_noref(nf);
+		nfsd_file_put(nf);
+		open_retry = false;
 		goto retry;
 	}
 
