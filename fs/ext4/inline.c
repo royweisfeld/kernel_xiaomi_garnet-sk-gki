@@ -1693,15 +1693,15 @@ struct buffer_head *ext4_find_inline_entry(struct inode *dir,
 		goto out;
 	}
 
-inline_start = (void *)ext4_raw_inode(&is.iloc)->i_block +
-               EXT4_INLINE_DOTDOT_SIZE;
-inline_size = EXT4_MIN_INLINE_DATA_SIZE - EXT4_INLINE_DOTDOT_SIZE;
-ret = ext4_search_dir(is.iloc.bh, inline_start, inline_size, 
-                      dir, fname, 0, 0, res_dir);
-if (ret == 1)
-    goto out_find;
-if (ret < 0)
-    goto out;
+	inline_start = (void *)ext4_raw_inode(&is.iloc)->i_block +
+						EXT4_INLINE_DOTDOT_SIZE;
+	inline_size = EXT4_MIN_INLINE_DATA_SIZE - EXT4_INLINE_DOTDOT_SIZE;
+	ret = ext4_search_dir(is.iloc.bh, inline_start, inline_size,
+			      dir, fname, 0, 0, res_dir);
+	if (ret == 1)
+		goto out_find;
+	if (ret < 0)
+		goto out;
 
 if (ext4_get_inline_size(dir) == EXT4_MIN_INLINE_DATA_SIZE)
     goto out;
@@ -1709,10 +1709,10 @@ if (ext4_get_inline_size(dir) == EXT4_MIN_INLINE_DATA_SIZE)
 inline_start = ext4_get_inline_xattr_pos(dir, &is.iloc);
 inline_size = ext4_get_inline_size(dir) - EXT4_MIN_INLINE_DATA_SIZE;
 
-ret = ext4_search_dir(is.iloc.bh, inline_start, inline_size, 
-                      dir, fname, 0, 0, res_dir);
-if (ret == 1)
-    goto out_find;
+	ret = ext4_search_dir(is.iloc.bh, inline_start, inline_size,
+			      dir, fname, 0, 0, res_dir);
+	if (ret == 1)
+		goto out_find;
 
 out:
 	brelse(is.iloc.bh);
